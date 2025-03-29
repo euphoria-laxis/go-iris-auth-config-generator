@@ -1,18 +1,50 @@
 #!/bin/bash
 
+# /****************** IRIS AUTH CONFIG GENERATOR ******************/
+# /* Generate JWT certs, keys and block hashes. Certs are saved into
+#    directory "$output" by default, the config file is saved to
+#    auth.yml by default.
+#  */
+
+while getopts ":o:c:" option; do
+    case "${option}" in
+        o)
+            output=${OPTARG}
+            ;;
+        c)
+            config=${OPTARG}
+            ;;
+        :)
+            echo "$OPTARG option require arguments"
+            usage
+            exit 1
+            ;;
+        \?)
+            echo "$OPTARG : invalid option"
+            exit 1
+            ;;
+    esac
+done
+
+usage () {
+    echo "o   output:       Output directory"
+    echo "c   config:       Config file"
+    echo Bye!
+}
+
 # Generate JWT keys
-rm -rf certs/jwt
-mkdir -p certs/jwt
-openssl genpkey -algorithm ed25519 -out ./certs/jwt/access_token.pkey.pem
-openssl pkey -in ./certs/jwt/access_token.pkey.pem -pubout -out ./certs/jwt/access_token.pub.pem
-openssl genpkey -algorithm ed25519 -out ./certs/jwt/refresh_token.pkey.pem
-openssl pkey -in ./certs/jwt/refresh_token.pkey.pem -pubout -out ./certs/jwt/refresh_token.pub.pem
+rm -rf "$output"
+mkdir -p "$output"
+openssl genpkey -algorithm ed25519 -out "$output"/access_token.pkey.pem
+openssl pkey -in "$output"/access_token.pkey.pem -pubout -out "$output"/access_token.pub.pem
+openssl genpkey -algorithm ed25519 -out "$output"/refresh_token.pkey.pem
+openssl pkey -in "$output"/refresh_token.pkey.pem -pubout -out "$output"/refresh_token.pub.pem
 
 # Generate hash and block keys
 HASH_KEY=$(pwgen -1 64)
 BLOCK_KEY=$(pwgen -1 32)
 
-# Generate auth.yml file
+# Generate "$config" file
 {
   echo 'Headers: # required.'
   echo '    - "Authorization"'
@@ -31,14 +63,14 @@ BLOCK_KEY=$(pwgen -1 32)
   echo '        Alg: EdDSA'
   echo '        MaxAge: 2h # 2 hours lifetime for access tokens.'
   echo '        Private: |+'
-} > auth.yml
+} > "$config"
 while read -r l; do
-  echo "            $l" >> auth.yml
-done <./certs/jwt/access_token.pkey.pem
-echo '        Public: |+' >> auth.yml
+  echo "            $l" >> "$config"
+done < "$output"/access_token.pkey.pem
+echo '        Public: |+' >> "$config"
 while read -r l; do
-  echo "            $l" >> auth.yml
-done <./certs/jwt/access_token.pub.pem
+  echo "            $l" >> "$config"
+done < "$output"/access_token.pub.pem
 {
   echo '    -   ID: IRIS_AUTH_REFRESH # optional. Good practise to have it though.'
   echo '        Alg: EdDSA'
@@ -46,11 +78,11 @@ done <./certs/jwt/access_token.pub.pem
   echo '        # after that period the user has to signin again.'
   echo '        MaxAge: 720h'
   echo '        Private: |+'
-} >> auth.yml
+} >> "$config"
 while read -r l; do
-  echo "            $l" >> auth.yml
-done <./certs/jwt/refresh_token.pkey.pem
-echo '        Public: |+' >> auth.yml
+  echo "            $l" >> "$config"
+done <"$output"/refresh_token.pkey.pem
+echo '        Public: |+' >> "$config"
 while read -r l; do
-  echo "            $l" >> auth.yml
-done <./certs/jwt/refresh_token.pub.pem
+  echo "            $l" >> "$config"
+done <"$output"/refresh_token.pub.pem

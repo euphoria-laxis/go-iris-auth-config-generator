@@ -20,5 +20,5 @@ $ sudo apt install openssl pwgen
 
 ````bash
 $ chmod +x generate.sh # make the script executable
-$ ./generate.sh
+$ ./generate.sh -c <config_file> -o <certs_output>
 ````
