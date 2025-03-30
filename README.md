@@ -32,7 +32,7 @@ $ chmod +x generate.sh # make the script executable
 $ ./generate.sh -a <Ed25519|secp384r1> [-c <config_file>] [-o <certs_output>]
 ````
 
-**Arguments: **
+**Arguments:**
 
 * algorithm **-a** `required` : set keypairs encryption algorithm. Values accepted: **[Ed25519,secp384r1]**.
 * output    **-o** *optional* : set JWT keypairs output directory.
