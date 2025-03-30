@@ -11,6 +11,8 @@ BASH script to generate auth.yml config files with new certificates and keys for
 
 #### Debian/Ubuntu
 
+**Install openssl and pwgen**
+
 ````bash
 $ sudo apt update # always refresh cache before installing new packages
 $ sudo apt install openssl pwgen
@@ -18,7 +20,22 @@ $ sudo apt install openssl pwgen
 
 ## Usage
 
+**Add execution permission to script:** 
+
 ````bash
 $ chmod +x generate.sh # make the script executable
-$ ./generate.sh -c <config_file> -o <certs_output>
 ````
+
+**Usage example:**
+
+````bash
+$ ./generate.sh -a <Ed25519|secp384r1> [-c <config_file>] [-o <certs_output>]
+````
+
+**Arguments: **
+
+* algorithm **-a** `required` : set keypairs encryption algorithm. Values accepted: **[Ed25519,secp384r1]**.
+* output    **-o** *optional* : set JWT keypairs output directory.
+* config    **-c** *optional* : set config filename.
+* help      **-h** : display usage.
+

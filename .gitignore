@@ -1,2 +1,10 @@
 ### JetBrains IDEs
 .idea
+
+### Vim
+
+**/*.swp
+
+### Generated files
+certs/
+*.yml
